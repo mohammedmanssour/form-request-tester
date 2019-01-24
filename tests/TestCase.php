@@ -1,7 +1,30 @@
 <?php
 
-class TestCase extends Orchestra\Testbench\TestCase
+namespace MohammedManssour\FormRequestTester\Tests;
+
+use Orchestra\Testbench\TestCase as BaseTestCase;
+use MohammedManssour\FormRequestTester\Tests\Stubs\ServiceProviders\RouteServiceProvider;
+
+class TestCase extends BaseTestCase
 {
+    /**
+     * Setup the test environment.
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->loadMigrationsFrom(__DIR__ . '/Stubs/Database/migrations');
+        $this->withFactories(__DIR__ . '/Stubs/Database/factories');
+
+    // and other test setup steps you need to perform
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [RouteServiceProvider::class];
+    }
+
     /**
      * Define environment setup.
      *
