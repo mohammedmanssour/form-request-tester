@@ -1,0 +1,20 @@
+{
+  "name": "mohammedmanssour/form-request-tester",
+  "description": "a collection of test helpers that help test form requests",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mohammed Manssour",
+      "email": "manssour.mohammed@gmail.com",
+      "homepage": "https://mohammedmanssour.me"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "MohammedManssour\\FormRequestTester\\": "src/"
+    }
+  },
+  "require-dev": {
+    "orchestra/testbench": "~3.0"
+  }
+}
