@@ -1,9 +1,10 @@
-#Laravel FormRequest Tester
+# Laravel FormRequest Tester
+
 A Simple collection of test helpers that help testing form request the easy way.
 
 ## Why Bother
 
-for full story on why this package was built please refer to [This Blog Post](https://mohammedmanssour.me/projects/testing-laravel-form-request)
+for full story on why this package was built please refer to [This Blog Post](https://mohammedmanssour.me/blog/testing-laravel-form-request/)
 
 ## Installation
 
