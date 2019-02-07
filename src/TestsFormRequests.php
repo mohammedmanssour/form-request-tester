@@ -210,7 +210,7 @@ trait TestsFormRequests
     public function assertValidationMessages($messages)
     {
         $errors = Arr::flatten(Arr::wrap($this->errors));
-        foreach ($errors as $message) {
+        foreach ($messages as $message) {
             $this->assertContains(
                 $message,
                 $errors,
