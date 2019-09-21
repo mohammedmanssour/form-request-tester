@@ -76,6 +76,10 @@ trait TestsFormRequests
             }
         });
 
+        $this->currentFormRequest->setUserResolver(function () {
+            return auth()->user();
+        });
+
         $this->validateFormRequest();
 
         return $this;

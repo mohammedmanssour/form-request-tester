@@ -33,7 +33,8 @@ class UpdatePost extends FormRequest
 
     public function authorize()
     {
-        return $this->getModel()->user_id == auth()->user()->id;
+        return $this->getModel()->user_id == auth()->user()->id &&
+          $this->getModel()->user_id == $this->user()->id;
     }
 
     public function getModel()
