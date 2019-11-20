@@ -7,10 +7,9 @@ use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Validation\ValidationException;
-use Modules\Payments\Http\Requests\UpdateAccount;
 use Illuminate\Auth\Access\AuthorizationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * TODO: add assertions to assert redirections
@@ -69,6 +68,11 @@ trait TestsFormRequests
             $route = null;
             try {
                 $route = $routes->match($this->currentFormRequest);
+
+                // Substitute Bindings
+                $router = app()->make(Registrar::class);
+                $router->substituteBindings($route);
+                $router->substituteImplicitBindings($route);
             } catch (\Exception $e) {
             }
             finally {

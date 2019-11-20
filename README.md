@@ -18,25 +18,25 @@ composer require --dev mohammedmanssour/form-request-tester
 
 ## Testing a form request
 
-1. you need to intialize the form request using `formRequest` method, it takes the FormRequest class as first argument and an array of request data as a second argument
+1. you need to initialize the form request using `formRequest` method, it takes the FormRequest class as first argument and an array of request data as a second argument
 
 ```php
 $this->formRequest(UpdatePost::class, [
     'title' => 'New Title',
-    'content' => 'Some Content here'
-])
+    'content' => 'Some Content here',
+]);
 ```
 
-the previous code will intialize the request with `post` method and `/fake-route` if you want to change these options you can via the options array that can be set as a third argument
+the previous code will initialize the request with `post` method and `/fake-route` if you want to change these options you can via the options array that can be set as a third argument
 
 ```php
 $this->formRequest(UpdatePost::class, [
     'title' => 'New Title',
-    'content' => 'Some Content here'
+    'content' => 'Some Content here',
 ], [
     'method' => 'put',
-    'route' => 'posts/{post}'
-])
+    'route' => 'posts/{post}',
+]);
 ```
 
 if you're using `$this->route` method in your form request or other related methods, then your form request won't be authorized unless you set the right http method and route via the `$options` array in order to get the right value for `$this->route` method
@@ -51,13 +51,13 @@ if you're using `$this->route` method in your form request or other related meth
 | `$this->assertValidationFailed()`                  | To make sure the validation have failed with the help of the provided data                                    |
 | `$this->assertValidationErrors($keysArray)`        | To assert that the keys mentioned in the `$keysArray` have occurred in the errors bag.                        |
 | `$this->assertValidationErrorsMissing($keysArray)` | To assert that the keys mentioned in the `$keysArray` have not occurred in the errors bag.                    |
-| `$this->assertValidationMessages($messagesArray)`  | To assert that the messeges exists in the error bag. Used when you define custom messages for your validation |
+| `$this->assertValidationMessages($messagesArray)`  | To assert that the messages exists in the error bag. Used when you define custom messages for your validation |
 | `$this->assertAuthorized()`                        | To assert that request have been authorized via the form request                                              |
 | `$this->assertNotAuthorized()`                     | To assert that request have not been authorized via the form request                                          |
 
 ### Example Usage:
 
-Taking into consderation:
+Taking into consideration:
 
 1. title & content are required field,
 2. **Content field is required** is a custom error message used for content field
@@ -65,16 +65,16 @@ Taking into consderation:
 4. `Route::put('posts/{post}', 'PostsController@update')` is the route used to update a post
 
 ```php
-$this->formRequest(UpdatePost::class,[
-    'title' => 'New Title'
-],[
-    'method' => 'put'
-    'route' => 'posts/{post}'
+$this->formRequest(UpdatePost::class, [
+    'title' => 'New Title',
+], [
+    'method' => 'put',
+    'route' => 'posts/{post}',
 ])->assertAuthorized()
-->assertValidationFailed()
-->assertValidationErrors(['content'])
-->assertValidationErrorsMissing(['title'])
-->assertValidationMessages(['Content field is required'])
+    ->assertValidationFailed()
+    ->assertValidationErrors(['content'])
+    ->assertValidationErrorsMissing(['title'])
+    ->assertValidationMessages(['Content field is required'])
 ```
 
 ## Contributors:
