@@ -76,6 +76,10 @@ trait TestsFormRequests
             }
         });
 
+        $this->currentFormRequest->setUserResolver(function () {
+            return auth()->user();
+        });
+
         $this->validateFormRequest();
 
         return $this;
@@ -129,7 +133,7 @@ trait TestsFormRequests
         }
 
         if (!empty($this->errors)) {
-            Assert::fail('Validation have failed');
+            Assert::fail('Validation failed: ' . json_encode($this->errors));
             return $this;
         }
 
