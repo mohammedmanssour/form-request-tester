@@ -80,3 +80,4 @@ $this->formRequest(UpdatePost::class,[
 ## Contributors:
 
 1. [Mohammed Manssour](https://mohammedmanssour.me)
+2. [Bryan Pedroza](https://www.bryanpedroza.com/)
