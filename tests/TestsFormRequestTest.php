@@ -29,14 +29,22 @@ class TestsFormRequestTest extends TestCase
     /** @test */
     public function validation_will_pass()
     {
+        $data = [
+            'content' => 'This is content',
+            'user_id' => $this->user->id
+        ];
+
         $this->formRequest(
             UpdatePost::class,
-            [
-                'content' => 'This is content',
-                'user_id' => $this->user->id
-            ],
+            $data,
             ['method' => 'put', 'route' => "posts/{$this->post->id}"]
         )->assertValidationPassed();
+
+        // test the ability to build form request using the intuitive methods
+        $this->formRequest(UpdatePost::class)
+            ->put($data)
+            ->withRoute("posts/{$this->post->id}")
+            ->assertValidationPassed();
     }
 
     /** @test */
@@ -50,17 +58,27 @@ class TestsFormRequestTest extends TestCase
             ->assertValidationFailed()
             ->assertValidationErrors(['user_id', 'content'])
             ->assertValidationMessages(['Content Field is required', 'User Field is required']);
+
+        // test the ability to build form request using the intuitive methods
+        $this->formRequest(UpdatePost::class)
+            ->put()
+            ->withRoute("posts/{$this->post->id}")
+            ->assertValidationFailed()
+            ->assertValidationErrors(['user_id', 'content'])
+            ->assertValidationMessages(['Content Field is required', 'User Field is required']);
     }
 
     /** @test */
     public function validation_will_fail_because_user_id_is_not_valid()
     {
+        $data = [
+            'content' => 'This is content',
+            'user_id' => 2000
+        ];
+
         $this->formRequest(
             UpdatePost::class,
-            [
-                'content' => 'This is content',
-                'user_id' => 2000
-            ],
+            $data,
             ['method' => 'put', 'route' => "posts/{$this->post->id}"]
         )
             ->assertValidationFailed()
@@ -77,6 +95,12 @@ class TestsFormRequestTest extends TestCase
             [],
             ['method' => 'put', 'route' => "posts/{$this->post->id}"]
         )->assertAuthorized();
+
+        // test the ability to build form request using the intuitive methods
+        $this->formRequest(UpdatePost::class)
+            ->put()
+            ->withRoute("posts/{$this->post->id}")
+            ->assertAuthorized();
     }
 
     /** @test */
