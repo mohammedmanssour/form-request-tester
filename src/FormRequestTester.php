@@ -72,6 +72,13 @@ class FormRequestTester {
     private $formRequestAuthorized = true;
 
     /**
+     * validated form request data
+     *
+     * @var array
+     */
+    private $validated;
+
+    /**
      * Create new FormRequestTester instance
      *
      * @param \Illuminate\Foundation\Testing\TestCase $test
@@ -386,5 +393,53 @@ class FormRequestTester {
     public function succeed($message = '')
     {
         $this->test->assertTrue(true, $message);
+    }
+
+    /**
+     * assert the validation errors has the following keys
+     *
+     * @param array $keys
+     * @return $this
+     */
+    public function assertValidationData($keys)
+    {
+        $this->checkFormRequest();
+
+        if (!$this->formRequestAuthorized) {
+            Assert::fail('Form request is not authorized');
+        }
+
+        foreach (Arr::wrap($keys) as $key) {
+            $this->test->assertTrue(
+                isset($this->validated[$key]),
+                "Failed to find a validation data for key: '{$key}'"
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * assert the validation data doesn't have a key
+     *
+     * @param array $keys
+     * @return $this
+     */
+    public function assertValidationDataMissing($keys)
+    {
+        $this->checkFormRequest();
+
+        if (!$this->formRequestAuthorized) {
+            Assert::fail('Form request is not authorized');
+        }
+
+        foreach (Arr::wrap($keys) as $key) {
+            $this->test->assertTrue(
+                !isset($this->validated[$key]),
+                "validation error for key: '{$key}' was found in validated array"
+            );
+        }
+
+        return $this;
     }
 }
