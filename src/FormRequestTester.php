@@ -234,6 +234,7 @@ class FormRequestTester {
     {
         try {
             $this->currentFormRequest->validateResolved();
+            $this->validated = $this->currentFormRequest->validated();
         } catch (ValidationException $e) {
             $this->errors = $e->errors();
         } catch (AuthorizationException $e) {
