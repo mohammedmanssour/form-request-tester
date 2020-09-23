@@ -3,6 +3,7 @@
 namespace MohammedManssour\FormRequestTester\Tests;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use MohammedManssour\FormRequestTester\FormRequestTester;
 use MohammedManssour\FormRequestTester\TestsFormRequests;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\Post;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\User;
@@ -114,4 +115,42 @@ class TestsFormRequestTest extends TestCase
             ['method' => 'put', 'route' => "posts/{$this->post->id}"]
         )->assertNotAuthorized();
     }
+
+    /** @test */
+    public function test_form_request_is_modifiable_before_validation() {
+        $data = [
+            'content' => 'This is content',
+            'user_id' => $this->user->id
+        ];
+
+        $formRequestTester = $this->formRequest(
+            UpdatePost::class,
+            $data,
+            ['method' => 'put', 'route' => "posts/{$this->post->id}"]
+        );
+        $formRequestTester->buildFormRequest();
+        $formRequestTester->assertValidationPassed();
+
+        $formRequestTester = $this->formRequest(
+            UpdatePost::class,
+            $data,
+            ['method' => 'put', 'route' => "posts/{$this->post->id}"]
+        );
+        $formRequestTester->buildFormRequest();
+        $currentFormRequest=$formRequestTester->getCurrentFormRequest();
+        $currentFormRequest->summaryIsRequired=true;
+        $formRequestTester->assertValidationFailed();
+
+        $data['summary'] = 'a summary';
+        $formRequestTester = $this->formRequest(
+            UpdatePost::class,
+            $data,
+            ['method' => 'put', 'route' => "posts/{$this->post->id}"]
+        );
+        $formRequestTester->buildFormRequest();
+        $currentFormRequest=$formRequestTester->getCurrentFormRequest();
+        $currentFormRequest->summaryIsRequired=true;
+        $formRequestTester->assertValidationPassed();
+    }
+
 }

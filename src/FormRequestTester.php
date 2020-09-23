@@ -2,6 +2,7 @@
 
 namespace MohammedManssour\FormRequestTester;
 
+use Illuminate\Foundation\Http\FormRequest;
 use \Mockery;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert;
@@ -25,6 +26,9 @@ class FormRequestTester {
      * @var FormRequest
      */
     private $currentFormRequest;
+
+
+    private $currentFormRequestIsValidated = false;
 
     /**
      * form request class
@@ -158,6 +162,14 @@ class FormRequestTester {
         return $this->method('delete', $data);
     }
 
+
+    /**
+     * get the current formrequest
+     */
+    public function getCurrentFormRequest() : ?FormRequest {
+        return $this->currentFormRequest;
+    }
+
     /*-----------------------------------------------------
     * Form Request specific methods
     -----------------------------------------------------*/
@@ -167,10 +179,14 @@ class FormRequestTester {
      * @return void
      */
     public function checkFormRequest() {
-        if(!is_null($this->currentFormRequest)) {
+        if(!is_null($this->currentFormRequest) && $this->currentFormRequestIsValidated) {
             return;
         }
-        $this->buildFormRequest();
+
+        if(is_null($this->currentFormRequest)) {
+            $this->buildFormRequest();
+        }
+
         $this->validateFormRequest();
     }
 
@@ -232,6 +248,8 @@ class FormRequestTester {
         } catch (AuthorizationException $e) {
             $this->formRequestAuthorized = false;
         }
+
+        $this->currentFormRequestIsValidated = true;
     }
 
     /*----------------------------------------------------

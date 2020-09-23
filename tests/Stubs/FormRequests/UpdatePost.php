@@ -2,6 +2,7 @@
 namespace MohammedManssour\FormRequestTester\Tests\Stubs\FormRequests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\Post;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -13,12 +14,16 @@ class UpdatePost extends FormRequest
      * @var \MohammedManssour\FormRequestTester\Tests\Stubs\Models\Post
      */
     public $model;
+    public $summaryIsRequired = false;
 
     public function rules()
     {
         return [
             'content' => ['required'],
-            'user_id' => ['required', 'exists:users,id']
+            'user_id' => ['required', 'exists:users,id'],
+            'summary' => Rule::requiredIf(function() {
+                return $this->summaryIsRequired;
+            })
         ];
     }
 
@@ -28,6 +33,7 @@ class UpdatePost extends FormRequest
             'content.required' => 'Content Field is required',
             'user_id.required' => 'User Field is required',
             'user_id.exists' => 'User is not valid',
+
         ];
     }
 
