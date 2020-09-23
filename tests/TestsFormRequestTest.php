@@ -14,7 +14,7 @@ class TestsFormRequestTest extends TestCase
         DatabaseMigrations,
         TestsFormRequests;
 
-    public function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 

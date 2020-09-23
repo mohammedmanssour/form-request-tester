@@ -179,7 +179,7 @@ class FormRequestTester {
      *
      * @return void
      */
-    private function buildFormRequest() {
+    public function buildFormRequest() {
         $this->currentFormRequest =
             $this->formRequest::create($this->route, $this->method, $this->data)
             ->setContainer($this->test->getApp())
