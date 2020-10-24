@@ -64,15 +64,17 @@ $this->formRequest(UpdatePost::class)
 
 ### Available Assertions
 
-|                                                    |                                                                                                               |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `$this->assertValidationPassed()`                  | To make sure the validation have passed successfully with the help of the provided data                       |
-| `$this->assertValidationFailed()`                  | To make sure the validation have failed with the help of the provided data                                    |
-| `$this->assertValidationErrors($keysArray)`        | To assert that the keys mentioned in the `$keysArray` have occurred in the errors bag.                        |
-| `$this->assertValidationErrorsMissing($keysArray)` | To assert that the keys mentioned in the `$keysArray` have not occurred in the errors bag.                    |
-| `$this->assertValidationMessages($messagesArray)`  | To assert that the messeges exists in the error bag. Used when you define custom messages for your validation |
-| `$this->assertAuthorized()`                        | To assert that request have been authorized via the form request                                              |
-| `$this->assertNotAuthorized()`                     | To assert that request have not been authorized via the form request                                          |
+|                                                    |                                                                                                                |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `$this->assertValidationPassed()`                  | To make sure the validation have passed successfully with the help of the provided data.                       |
+| `$this->assertValidationFailed()`                  | To make sure the validation have failed with the help of the provided data.                                    |
+| `$this->assertValidationErrors($keysArray)`        | To assert that the keys mentioned in the `$keysArray` have occurred in the errors bag.                         |
+| `$this->assertValidationErrorsMissing($keysArray)` | To assert that the keys mentioned in the `$keysArray` have not occurred in the errors bag.                     |
+| `$this->assertValidationMessages($messagesArray)`  | To assert that the messages exists in the error bag. Used when you define custom messages for your validation. |
+| `$this->assertAuthorized()`                        | To assert that request have been authorized via the form request.                                              |
+| `$this->assertNotAuthorized()`                     | To assert that request have not been authorized via the form request.                                          |
+| `$this->assertValidationData($keysArray)`          | To assert that the keys mentioned in the `$keysArray` have occurred in the validated data.                     |
+| `$this->assertValidationDataMissing($keysArray)`   | To assert that the keys mentioned in the `$keysArray` have not occurred in the validated data.                 |
 
 ### Example Usage:
 
