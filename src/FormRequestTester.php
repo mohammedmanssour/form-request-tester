@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 
-class FormRequestTester {
+class FormRequestTester
+{
 
     /**
      * laravel test case
@@ -91,13 +92,14 @@ class FormRequestTester {
     /*-----------------------------------------------------
      * Setters and getters
      -----------------------------------------------------*/
-     /**
-      * set FormRequest Class
-      *
-      * @param string $formRequest
-      * @return \MohammedManssour\FormRequestTester\FormRequestTester
-      */
-    public function setFormRequest($formRequest) {
+    /**
+     * set FormRequest Class
+     *
+     * @param string $formRequest
+     * @return \MohammedManssour\FormRequestTester\FormRequestTester
+     */
+    public function setFormRequest($formRequest)
+    {
         $this->formRequest = $formRequest;
         return $this;
     }
@@ -106,9 +108,10 @@ class FormRequestTester {
      * set FormRequest route
      *
      * @param string $route
-     * @return \Illuminate\Foundation\Http\FormRequest
+     * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function withRoute($route) {
+    public function withRoute($route)
+    {
         $this->route = $route;
         return $this;
     }
@@ -120,7 +123,8 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function method($method, $data = []) {
+    public function method($method, $data = [])
+    {
         $this->method = $method;
         $this->data = $data;
         return $this;
@@ -131,7 +135,8 @@ class FormRequestTester {
      *
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function get() {
+    public function get()
+    {
         return $this->method('get', []);
     }
 
@@ -141,7 +146,8 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function post($data = []) {
+    public function post($data = [])
+    {
         return $this->method('post', $data);
     }
 
@@ -151,7 +157,8 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function put($data = []) {
+    public function put($data = [])
+    {
         return $this->method('put', $data);
     }
 
@@ -161,7 +168,8 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function delete($data = []) {
+    public function delete($data = [])
+    {
         return $this->method('delete', $data);
     }
 
@@ -173,8 +181,9 @@ class FormRequestTester {
      *
      * @return void
      */
-    public function checkFormRequest() {
-        if(!is_null($this->currentFormRequest)) {
+    public function checkFormRequest()
+    {
+        if (!is_null($this->currentFormRequest)) {
             return;
         }
         $this->buildFormRequest();
@@ -186,7 +195,8 @@ class FormRequestTester {
      *
      * @return void
      */
-    private function buildFormRequest() {
+    private function buildFormRequest()
+    {
         $this->currentFormRequest =
             $this->formRequest::create($this->route, $this->method, $this->data)
             ->setContainer($this->test->getApp())
@@ -198,8 +208,7 @@ class FormRequestTester {
             try {
                 $route = $routes->match($this->currentFormRequest);
             } catch (\Exception $e) {
-            }
-            finally {
+            } finally {
                 return $route;
             }
         });
