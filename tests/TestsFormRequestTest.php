@@ -2,6 +2,7 @@
 
 namespace MohammedManssour\FormRequestTester\Tests;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use MohammedManssour\FormRequestTester\TestsFormRequests;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\Post;
@@ -127,5 +128,18 @@ class TestsFormRequestTest extends TestCase
             ->assertValidationPassed()
             ->assertValidationData(['content', 'user_id'])
             ->assertValidationDataMissing(['not_available_key']);
+    }
+
+    /** @test */
+    public function substitube_binding_can_retreive_the_right_model()
+    {
+        Route::model('post', Post::class);
+
+        $tester = $this->formRequest(UpdatePost::class)
+            ->put([])
+            ->withRoute("posts/{$this->post->id}");
+        $tester->checkFormRequest();
+
+        $this->assertInstanceOf(Post::class, $tester->formRequest()->route('post'));
     }
 }
