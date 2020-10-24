@@ -49,10 +49,6 @@ $this->formRequest(UpdatePost::class, [
 ])
 ```
 
-if you're using `$this->route` method in your form request or other related methods, then your form request won't be authorized unless you set the right http method and route via the `$options` array in order to get the right value for `$this->route` method
-
-Intuitive methods were also introduced to make setting the route easier
-
 ```php
 $this->formRequest(UpdatePost::class)
 ->put([
@@ -107,12 +103,57 @@ $this->formRequest(UpdatePost::class)
 ->put([
     'title' => 'New Title'
 ])
-->withRoute('posts/{post}')
+->withRoute('posts/1')
 ->assertAuthorized()
 ->assertValidationFailed()
 ->assertValidationErrors(['content'])
 ->assertValidationErrorsMissing(['title'])
 ->assertValidationMessages(['Content field is required'])
+```
+
+## Form Requests related methods and how to work with them
+
+### `$this->route('parameter')`:
+
+This method basically retreive the value of a routing rule parameter.
+
+For example if you have a routing rule `put posts/{post}` and browsed to `posts/1` then the value of `$this->route('post')` is **1**.
+for this to work with the package you need to
+
+1. Register the routing rule in your application routing files `web.php` or `api.php`
+
+```php
+Route::put('posts/{post}', [PostsController::class, 'update']);
+```
+
+2. set the route using **FormRequestTester** `withRoute` method
+
+```php
+$this->formRequest(UpdatePost::class)
+    ->put($data)
+    ->withRoute('posts/1');
+```
+
+this why when you use the `$this->route('post')` in your form request, the result will be **1**.
+
+The package also supports substitube binding. All you need to be is to ؤreate an explicit binding and will do the work for you.
+
+```php
+// somewhere in your app 🤔, ideally, your service provider
+Route::model('post', Post::class);
+```
+
+when you do the reigster, the value of `$this->route('post')` will be a **Post** model rather than the id.
+
+### `$this->user()`:
+
+This method will reteive the current authenticated user.
+
+use laravel testing method `actingAs` to set a user as the current authenticated user
+
+```php
+$user = User::factory()->create();
+$this->actingAs($user);
 ```
 
 ## Contributors:

@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -23,7 +24,7 @@ class FormRequestTester
     /**
      * current instance of the form request
      *
-     * @var FormRequest
+     * @var \Illuminate\Foundation\Http\FormRequest
      */
     private $currentFormRequest;
 
@@ -173,6 +174,16 @@ class FormRequestTester
         return $this->method('delete', $data);
     }
 
+    /**
+     * get current form requset
+     *
+     * @return \Illuminate\Foundation\Http\FormRequest
+     */
+    public function formRequest()
+    {
+        return $this->currentFormRequest;
+    }
+
     /*-----------------------------------------------------
     * Form Request specific methods
     -----------------------------------------------------*/
@@ -203,19 +214,10 @@ class FormRequestTester
             ->setRedirector($this->makeRequestRedirector());
 
         $this->currentFormRequest->setRouteResolver(function () {
-            $routes = Route::getRoutes();
-            $route = null;
-            try {
-                $route = $routes->match($this->currentFormRequest);
-            } catch (\Exception $e) {
-            } finally {
-                return $route;
-            }
+            return $this->routeResolver();
         });
 
-        $this->currentFormRequest->setUserResolver(function () {
-            return auth()->user();
-        });
+        $this->userResolver();
     }
 
     /**
@@ -249,6 +251,41 @@ class FormRequestTester
         } catch (AuthorizationException $e) {
             $this->formRequestAuthorized = false;
         }
+    }
+
+    /**
+     * find the routing rule that matches the route provided with withRoute
+     *
+     * @return void
+     */
+    private function routeResolver()
+    {
+        $routes = Route::getRoutes();
+        try {
+            $route = $routes->match($this->currentFormRequest);
+
+            // Substitute Bindings
+            $router = app()->make(Registrar::class);
+            $router->substituteBindings($route);
+            $router->substituteImplicitBindings($route);
+
+            return $route;
+        } catch (\Exception $e) {
+        }
+
+        return null;
+    }
+
+    /**
+     * add the logic that formRequest needs to resolve user
+     *
+     * @return void
+     */
+    public function userResolver()
+    {
+        $this->currentFormRequest->setUserResolver(function () {
+            return auth()->user();
+        });
     }
 
     /*----------------------------------------------------
