@@ -10,14 +10,13 @@ class TestCase extends BaseTestCase
     /**
      * Setup the test environment.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->loadMigrationsFrom(__DIR__ . '/Stubs/Database/migrations');
-        $this->withFactories(__DIR__ . '/Stubs/Database/factories');
 
-    // and other test setup steps you need to perform
+        // and other test setup steps you need to perform
     }
 
     protected function getPackageProviders($app)
@@ -33,7 +32,7 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-    // Setup default database to use sqlite :memory:
+        // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
             'driver' => 'sqlite',
