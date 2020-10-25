@@ -142,4 +142,18 @@ class TestsFormRequestTest extends TestCase
 
         $this->assertInstanceOf(Post::class, $tester->formRequest()->route('post'));
     }
+
+    /** @test */
+    public function can_resolve_route_parameters_with_the_help_of_addRouteParameter_method()
+    {
+        $formRequestTester = $this->formRequest(UpdatePost::class)
+            ->put([
+                'content' => 'Fake Content',
+                'user_id' => $this->user->id
+            ])->addRouteParameter('post', $this->post->id)
+            ->assertAuthorized()
+            ->assertValidationPassed();
+
+        $this->assertEquals(1, $formRequestTester->formRequest()->route('post'));
+    }
 }
