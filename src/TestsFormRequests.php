@@ -31,7 +31,7 @@ trait TestsFormRequests
     {
         $options = array_merge([
             'method' => 'post',
-            'route' => '/fake-route'
+            'route' => null
         ], $options);
 
         return (new FormRequestTester($this))
@@ -40,7 +40,8 @@ trait TestsFormRequests
             ->withRoute($options['route']);
     }
 
-    public function getApp() {
+    public function getApp()
+    {
         return $this->app;
     }
 }

@@ -52,6 +52,13 @@ class FormRequestTester
     private $route;
 
     /**
+     * key/values pair of route paramters to be user with $this->route('parameter') name
+     *
+     * @var array
+     */
+    private $routeParameters = [];
+
+    /**
      * form request data
      *
      * @var array
@@ -114,6 +121,19 @@ class FormRequestTester
     public function withRoute($route)
     {
         $this->route = $route;
+        return $this;
+    }
+
+    /**
+     * add route parameter to be resolved when using $this->route('parameter')
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return \MohammedManssour\FormRequestTester\FormRequestTester
+     */
+    public function addRouteParameter($name, $value)
+    {
+        $this->routeParameters[$name] = $value;
         return $this;
     }
 
@@ -209,11 +229,12 @@ class FormRequestTester
     private function buildFormRequest()
     {
         $this->currentFormRequest =
-            $this->formRequest::create($this->route, $this->method, $this->data)
+            $this->formRequest::create($this->getRoute(), $this->method, $this->data)
             ->setContainer($this->test->getApp())
             ->setRedirector($this->makeRequestRedirector());
 
         $this->currentFormRequest->setRouteResolver(function () {
+            $this->registerFakeRouteRule();
             return $this->routeResolver();
         });
 
@@ -251,6 +272,38 @@ class FormRequestTester
         } catch (AuthorizationException $e) {
             $this->formRequestAuthorized = false;
         }
+    }
+
+    /**
+     * register Fake Route to be
+     *
+     * @return void
+     */
+    private function registerFakeRouteRule()
+    {
+        if (empty($this->routeParameters)) {
+            return null;
+        }
+
+        $fakeRoute = collect($this->routeParameters)
+            ->keys()
+            ->map(fn ($param) => "{{$param}}")
+            ->prepend('fake-route')
+            ->implode('/');
+
+        Route::{$this->method}($fakeRoute);
+    }
+
+    private function getRoute()
+    {
+        if ($this->route) {
+            return $this->route;
+        }
+
+        return collect($this->routeParameters)
+            ->map(fn ($value) => $value)
+            ->prepend('fake-route')
+            ->implode('/');
     }
 
     /**

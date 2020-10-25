@@ -145,6 +145,19 @@ Route::model('post', Post::class);
 
 when you do the reigster, the value of `$this->route('post')` will be a **Post** model rather than the id.
 
+**Alternatively**
+
+if you don't want to register a route just for the sake of resolving a route parameter then you can use **FormRequestTester** `addRouteParameter($name, $value)`.
+
+```php
+$this->formRequest(UpdatePost::class)
+    ->put($data)
+    ->addRouteParameter('post', 1)
+    ->assertAuthorized();
+```
+
+according to the example above, with the new method `addRouteParameter`, `$this->route('post')` will be resolved to **1**
+
 ### `$this->user()`:
 
 This method will reteive the current authenticated user.
