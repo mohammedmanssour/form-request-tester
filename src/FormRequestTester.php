@@ -7,10 +7,12 @@ use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 
-class FormRequestTester {
+class FormRequestTester
+{
 
     /**
      * laravel test case
@@ -22,7 +24,7 @@ class FormRequestTester {
     /**
      * current instance of the form request
      *
-     * @var FormRequest
+     * @var \Illuminate\Foundation\Http\FormRequest
      */
     private $currentFormRequest;
 
@@ -50,6 +52,13 @@ class FormRequestTester {
     private $route;
 
     /**
+     * key/values pair of route paramters to be user with $this->route('parameter') name
+     *
+     * @var array
+     */
+    private $routeParameters = [];
+
+    /**
      * form request data
      *
      * @var array
@@ -72,6 +81,13 @@ class FormRequestTester {
     private $formRequestAuthorized = true;
 
     /**
+     * validated form request data
+     *
+     * @var array
+     */
+    private $validated;
+
+    /**
      * Create new FormRequestTester instance
      *
      * @param \Illuminate\Foundation\Testing\TestCase $test
@@ -84,13 +100,14 @@ class FormRequestTester {
     /*-----------------------------------------------------
      * Setters and getters
      -----------------------------------------------------*/
-     /**
-      * set FormRequest Class
-      *
-      * @param string $formRequest
-      * @return \MohammedManssour\FormRequestTester\FormRequestTester
-      */
-    public function setFormRequest($formRequest) {
+    /**
+     * set FormRequest Class
+     *
+     * @param string $formRequest
+     * @return \MohammedManssour\FormRequestTester\FormRequestTester
+     */
+    public function setFormRequest($formRequest)
+    {
         $this->formRequest = $formRequest;
         return $this;
     }
@@ -99,10 +116,24 @@ class FormRequestTester {
      * set FormRequest route
      *
      * @param string $route
-     * @return \Illuminate\Foundation\Http\FormRequest
+     * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function withRoute($route) {
+    public function withRoute($route)
+    {
         $this->route = $route;
+        return $this;
+    }
+
+    /**
+     * add route parameter to be resolved when using $this->route('parameter')
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return \MohammedManssour\FormRequestTester\FormRequestTester
+     */
+    public function addRouteParameter($name, $value)
+    {
+        $this->routeParameters[$name] = $value;
         return $this;
     }
 
@@ -113,7 +144,8 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function method($method, $data = []) {
+    public function method($method, $data = [])
+    {
         $this->method = $method;
         $this->data = $data;
         return $this;
@@ -124,7 +156,8 @@ class FormRequestTester {
      *
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function get() {
+    public function get()
+    {
         return $this->method('get', []);
     }
 
@@ -134,7 +167,8 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function post($data = []) {
+    public function post($data = [])
+    {
         return $this->method('post', $data);
     }
 
@@ -144,7 +178,8 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function put($data = []) {
+    public function put($data = [])
+    {
         return $this->method('put', $data);
     }
 
@@ -154,8 +189,19 @@ class FormRequestTester {
      * @param array $data
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function delete($data = []) {
+    public function delete($data = [])
+    {
         return $this->method('delete', $data);
+    }
+
+    /**
+     * get current form requset
+     *
+     * @return \Illuminate\Foundation\Http\FormRequest
+     */
+    public function formRequest()
+    {
+        return $this->currentFormRequest;
     }
 
     /*-----------------------------------------------------
@@ -166,8 +212,9 @@ class FormRequestTester {
      *
      * @return void
      */
-    public function checkFormRequest() {
-        if(!is_null($this->currentFormRequest)) {
+    public function checkFormRequest()
+    {
+        if (!is_null($this->currentFormRequest)) {
             return;
         }
         $this->buildFormRequest();
@@ -179,27 +226,19 @@ class FormRequestTester {
      *
      * @return void
      */
-    public function buildFormRequest() {
+    private function buildFormRequest()
+    {
         $this->currentFormRequest =
-            $this->formRequest::create($this->route, $this->method, $this->data)
+            $this->formRequest::create($this->getRoute(), $this->method, $this->data)
             ->setContainer($this->test->getApp())
             ->setRedirector($this->makeRequestRedirector());
 
         $this->currentFormRequest->setRouteResolver(function () {
-            $routes = Route::getRoutes();
-            $route = null;
-            try {
-                $route = $routes->match($this->currentFormRequest);
-            } catch (\Exception $e) {
-            }
-            finally {
-                return $route;
-            }
+            $this->registerFakeRouteRule();
+            return $this->routeResolver();
         });
 
-        $this->currentFormRequest->setUserResolver(function () {
-            return auth()->user();
-        });
+        $this->userResolver();
     }
 
     /**
@@ -227,11 +266,79 @@ class FormRequestTester {
     {
         try {
             $this->currentFormRequest->validateResolved();
+            $this->validated = $this->currentFormRequest->validated();
         } catch (ValidationException $e) {
             $this->errors = $e->errors();
         } catch (AuthorizationException $e) {
             $this->formRequestAuthorized = false;
         }
+    }
+
+    /**
+     * register Fake Route to be
+     *
+     * @return void
+     */
+    private function registerFakeRouteRule()
+    {
+        if (empty($this->routeParameters)) {
+            return null;
+        }
+
+        $fakeRoute = collect($this->routeParameters)
+            ->keys()
+            ->map(fn ($param) => "{{$param}}")
+            ->prepend('fake-route')
+            ->implode('/');
+
+        Route::{$this->method}($fakeRoute);
+    }
+
+    private function getRoute()
+    {
+        if ($this->route) {
+            return $this->route;
+        }
+
+        return collect($this->routeParameters)
+            ->map(fn ($value) => $value)
+            ->prepend('fake-route')
+            ->implode('/');
+    }
+
+    /**
+     * find the routing rule that matches the route provided with withRoute
+     *
+     * @return void
+     */
+    private function routeResolver()
+    {
+        $routes = Route::getRoutes();
+        try {
+            $route = $routes->match($this->currentFormRequest);
+
+            // Substitute Bindings
+            $router = app()->make(Registrar::class);
+            $router->substituteBindings($route);
+            $router->substituteImplicitBindings($route);
+
+            return $route;
+        } catch (\Exception $e) {
+        }
+
+        return null;
+    }
+
+    /**
+     * add the logic that formRequest needs to resolve user
+     *
+     * @return void
+     */
+    public function userResolver()
+    {
+        $this->currentFormRequest->setUserResolver(function () {
+            return auth()->user();
+        });
     }
 
     /*----------------------------------------------------
@@ -386,5 +493,53 @@ class FormRequestTester {
     public function succeed($message = '')
     {
         $this->test->assertTrue(true, $message);
+    }
+
+    /**
+     * assert the validation errors has the following keys
+     *
+     * @param array $keys
+     * @return $this
+     */
+    public function assertValidationData($keys)
+    {
+        $this->checkFormRequest();
+
+        if (!$this->formRequestAuthorized) {
+            Assert::fail('Form request is not authorized');
+        }
+
+        foreach (Arr::wrap($keys) as $key) {
+            $this->test->assertTrue(
+                isset($this->validated[$key]),
+                "Failed to find a validation data for key: '{$key}'"
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * assert the validation data doesn't have a key
+     *
+     * @param array $keys
+     * @return $this
+     */
+    public function assertValidationDataMissing($keys)
+    {
+        $this->checkFormRequest();
+
+        if (!$this->formRequestAuthorized) {
+            Assert::fail('Form request is not authorized');
+        }
+
+        foreach (Arr::wrap($keys) as $key) {
+            $this->test->assertTrue(
+                !isset($this->validated[$key]),
+                "validation error for key: '{$key}' was found in validated array"
+            );
+        }
+
+        return $this;
     }
 }

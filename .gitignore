@@ -1,3 +1,4 @@
 vendor
 _ide_helper.php
 .vscode
+.phpunit.result.cache

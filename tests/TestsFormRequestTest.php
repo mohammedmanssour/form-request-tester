@@ -2,6 +2,7 @@
 
 namespace MohammedManssour\FormRequestTester\Tests;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use MohammedManssour\FormRequestTester\TestsFormRequests;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\Post;
@@ -14,13 +15,13 @@ class TestsFormRequestTest extends TestCase
         DatabaseMigrations,
         TestsFormRequests;
 
-    protected function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
-        $this->post = factory(Post::class)->create([
-            'user_id' => $this->user->id
+        $this->user = User::factory()->create();
+        $this->post = Post::factory()->create([
+            'user_id' => $this->user
         ]);
 
         $this->actingAs($this->user);
@@ -106,12 +107,53 @@ class TestsFormRequestTest extends TestCase
     /** @test */
     public function form_request_will_not_authorize_request()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->actingAs($user);
         $this->formRequest(
             UpdatePost::class,
             [],
             ['method' => 'put', 'route' => "posts/{$this->post->id}"]
         )->assertNotAuthorized();
+    }
+
+    /** @test */
+    public function form_request_will_assert_the_validated_data()
+    {
+        $this->formRequest(UpdatePost::class)
+            ->put([
+                'content' => 'Fake Content',
+                'user_id' => $this->user->id,
+            ])
+            ->withRoute("posts/{$this->post->id}")
+            ->assertValidationPassed()
+            ->assertValidationData(['content', 'user_id'])
+            ->assertValidationDataMissing(['not_available_key']);
+    }
+
+    /** @test */
+    public function substitube_binding_can_retreive_the_right_model()
+    {
+        Route::model('post', Post::class);
+
+        $tester = $this->formRequest(UpdatePost::class)
+            ->put([])
+            ->withRoute("posts/{$this->post->id}");
+        $tester->checkFormRequest();
+
+        $this->assertInstanceOf(Post::class, $tester->formRequest()->route('post'));
+    }
+
+    /** @test */
+    public function can_resolve_route_parameters_with_the_help_of_addRouteParameter_method()
+    {
+        $formRequestTester = $this->formRequest(UpdatePost::class)
+            ->put([
+                'content' => 'Fake Content',
+                'user_id' => $this->user->id
+            ])->addRouteParameter('post', $this->post->id)
+            ->assertAuthorized()
+            ->assertValidationPassed();
+
+        $this->assertEquals(1, $formRequestTester->formRequest()->route('post'));
     }
 }

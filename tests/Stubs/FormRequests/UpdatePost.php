@@ -1,4 +1,5 @@
 <?php
+
 namespace MohammedManssour\FormRequestTester\Tests\Stubs\FormRequests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -38,11 +39,17 @@ class UpdatePost extends FormRequest
 
     public function getModel()
     {
-        if (!$this->model) {
-            $this->model = Post::find($this->route('post'));
-            throw_if(!$this->model, NotFoundHttpException::class);
+        if ($this->model) {
+            return $this->model;
         }
 
+        if (is_a($this->route('post'), Post::class)) {
+            $this->model = $this->route('post');
+            return $this->model;
+        }
+
+        $this->model = Post::find($this->route('post'));
+        throw_if(!$this->model, NotFoundHttpException::class);
         return $this->model;
     }
 }

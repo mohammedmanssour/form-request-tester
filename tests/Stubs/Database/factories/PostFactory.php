@@ -1,14 +1,30 @@
 <?php
 
-use Faker\Generator as Faker;
+namespace MohammedManssour\FormRequestTester\Tests\Stubs\Database\factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\Post;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\User;
 
-$factory->define(Post::class, function (Faker $faker) {
-    return [
-        'content' => $faker->paragraph(),
-        'user_id' => function () {
-            factory(User::class)->create()->id;
-        }
-    ];
-});
+class PostFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Post::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'content' => $this->faker->paragraph(),
+            'user_id' => User::factory()
+        ];
+    }
+}
