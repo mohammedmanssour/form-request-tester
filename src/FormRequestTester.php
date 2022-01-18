@@ -218,7 +218,7 @@ class FormRequestTester
             return;
         }
 
-        if (is_null($this->checkFormRequest())) {
+        if (is_null($this->currentFormRequest)) {
             $this->buildFormRequest();
         }
 
