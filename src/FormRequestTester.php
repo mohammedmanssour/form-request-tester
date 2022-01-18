@@ -214,7 +214,7 @@ class FormRequestTester
      */
     public function checkFormRequest()
     {
-        if (!is_null($this->currentFormRequest)) {
+        if (!is_null($this->currentFormRequest) && !is_null($this->validated)) {
             return;
         }
         $this->buildFormRequest();
