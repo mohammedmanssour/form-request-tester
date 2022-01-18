@@ -226,7 +226,7 @@ class FormRequestTester
      *
      * @return void
      */
-    private function buildFormRequest()
+    public function buildFormRequest()
     {
         $this->currentFormRequest =
             $this->formRequest::create($this->getRoute(), $this->method, $this->data)
