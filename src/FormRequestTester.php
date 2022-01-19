@@ -87,6 +87,9 @@ class FormRequestTester
      */
     private $validated;
 
+
+    private $validationHasBeenRun = false;
+
     /**
      * Create new FormRequestTester instance
      *
@@ -214,7 +217,7 @@ class FormRequestTester
      */
     public function checkFormRequest()
     {
-        if (!is_null($this->currentFormRequest) && !is_null($this->validated)) {
+        if (!is_null($this->currentFormRequest) && $this->validationHasBeenRun) {
             return;
         }
 
@@ -276,6 +279,8 @@ class FormRequestTester
         } catch (AuthorizationException $e) {
             $this->formRequestAuthorized = false;
         }
+
+        $this->validationHasBeenRun = true;
     }
 
     /**
