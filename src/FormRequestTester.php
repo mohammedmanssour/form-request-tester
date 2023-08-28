@@ -201,6 +201,7 @@ class FormRequestTester
      */
     public function formRequest()
     {
+        $this->checkFormRequest();
         return $this->currentFormRequest;
     }
 
