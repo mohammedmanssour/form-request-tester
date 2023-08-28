@@ -451,7 +451,7 @@ class FormRequestTester
             $this->test->assertContains(
                 $message,
                 $errors,
-                "Failed to find the validation message '${message}' in the validation messages"
+                "Failed to find the validation message '{$message}' in the validation messages"
             );
         }
 
