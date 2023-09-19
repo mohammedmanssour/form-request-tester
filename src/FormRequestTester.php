@@ -512,7 +512,7 @@ class FormRequestTester
 
         foreach (Arr::wrap($keys) as $key) {
             $this->test->assertTrue(
-                isset($this->validated[$key]),
+                Arr::has($this->validated, $key),
                 "Failed to find a validation data for key: '{$key}'"
             );
         }
