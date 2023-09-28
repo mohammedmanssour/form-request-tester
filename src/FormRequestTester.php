@@ -87,6 +87,9 @@ class FormRequestTester
      */
     private $validated;
 
+
+    private $validationHasBeenRun = false;
+
     /**
      * Create new FormRequestTester instance
      *
@@ -215,10 +218,14 @@ class FormRequestTester
      */
     public function checkFormRequest()
     {
-        if (!is_null($this->currentFormRequest)) {
+        if (!is_null($this->currentFormRequest) && $this->validationHasBeenRun) {
             return;
         }
-        $this->buildFormRequest();
+
+        if (is_null($this->currentFormRequest)) {
+            $this->buildFormRequest();
+        }
+
         $this->validateFormRequest();
     }
 
@@ -227,7 +234,7 @@ class FormRequestTester
      *
      * @return void
      */
-    private function buildFormRequest()
+    public function buildFormRequest()
     {
         $this->currentFormRequest =
             $this->formRequest::create($this->getRoute(), $this->method, $this->data)
@@ -273,6 +280,8 @@ class FormRequestTester
         } catch (AuthorizationException $e) {
             $this->formRequestAuthorized = false;
         }
+
+        $this->validationHasBeenRun = true;
     }
 
     /**
