@@ -536,7 +536,7 @@ class FormRequestTester
 
         foreach (Arr::wrap($keys) as $key) {
             $this->test->assertTrue(
-                !isset($this->validated[$key]),
+                !Arr::has($this->validated, $key),
                 "validation error for key: '{$key}' was found in validated array"
             );
         }
