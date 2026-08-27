@@ -3,6 +3,7 @@
 namespace MohammedManssour\FormRequestTester\Tests;
 
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use MohammedManssour\FormRequestTester\TestsFormRequests;
 use MohammedManssour\FormRequestTester\Tests\Stubs\Models\Post;
@@ -15,7 +16,11 @@ class TestsFormRequestTest extends TestCase
         DatabaseMigrations,
         TestsFormRequests;
 
-    public function setUp(): void
+    private User $user;
+
+    private Post $post;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +32,7 @@ class TestsFormRequestTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function validation_will_pass()
     {
         $data = [
@@ -48,7 +53,7 @@ class TestsFormRequestTest extends TestCase
             ->assertValidationPassed();
     }
 
-    /** @test */
+    #[Test]
     public function validation_will_fail()
     {
         $this->formRequest(
@@ -69,7 +74,7 @@ class TestsFormRequestTest extends TestCase
             ->assertValidationMessages(['Content Field is required', 'User Field is required']);
     }
 
-    /** @test */
+    #[Test]
     public function validation_will_fail_because_user_id_is_not_valid()
     {
         $data = [
@@ -88,7 +93,7 @@ class TestsFormRequestTest extends TestCase
             ->assertValidationMessages(['User is not valid']);
     }
 
-    /** @test */
+    #[Test]
     public function form_request_will_authorize_request()
     {
         $this->formRequest(
@@ -104,7 +109,7 @@ class TestsFormRequestTest extends TestCase
             ->assertAuthorized();
     }
 
-    /** @test */
+    #[Test]
     public function form_request_will_not_authorize_request()
     {
         $user = User::factory()->create();
@@ -116,7 +121,7 @@ class TestsFormRequestTest extends TestCase
         )->assertNotAuthorized();
     }
 
-    /** @test */
+    #[Test]
     public function form_request_will_assert_the_validated_data()
     {
         $this->formRequest(UpdatePost::class)
@@ -130,7 +135,7 @@ class TestsFormRequestTest extends TestCase
             ->assertValidationDataMissing(['not_available_key']);
     }
 
-    /** @test */
+    #[Test]
     public function substitube_binding_can_retreive_the_right_model()
     {
         Route::model('post', Post::class);
@@ -143,7 +148,7 @@ class TestsFormRequestTest extends TestCase
         $this->assertInstanceOf(Post::class, $tester->formRequest()->route('post'));
     }
 
-    /** @test */
+    #[Test]
     public function can_resolve_route_parameters_with_the_help_of_addRouteParameter_method()
     {
         $formRequestTester = $this->formRequest(UpdatePost::class)

@@ -15,7 +15,7 @@ class UpdatePost extends FormRequest
      */
     public $model;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'content' => ['required'],
@@ -23,7 +23,7 @@ class UpdatePost extends FormRequest
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'content.required' => 'Content Field is required',
@@ -32,12 +32,12 @@ class UpdatePost extends FormRequest
         ];
     }
 
-    public function authorize()
+    public function authorize(): bool
     {
         return $this->getModel()->user_id == $this->user()->id;
     }
 
-    public function getModel()
+    public function getModel(): Post
     {
         if ($this->model) {
             return $this->model;

@@ -2,26 +2,14 @@
 
 namespace MohammedManssour\FormRequestTester\Tests\Stubs\ServiceProviders;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-
-    /**
-     * Define your route model bindings, pattern filters, etc.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        parent::boot();
-    }
-
-    public function map()
+    public function map(): void
     {
         // load routes from here
-        Route::put('posts/{post}', 'PostsController@update');
+        Route::put('posts/{post}', fn () => null);
     }
-
 }

@@ -2,8 +2,6 @@
 
 namespace MohammedManssour\FormRequestTester;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
 /**
  * TODO: add assertions to assert redirections
  */
@@ -27,7 +25,7 @@ trait TestsFormRequests
      * @param array $options ['route' => 'Route to instantiate form request with', 'method' => 'to instantiate form request with']
      * @return \MohammedManssour\FormRequestTester\FormRequestTester
      */
-    public function formRequest(string $formRequestType, $data = [], $options = [])
+    public function formRequest(string $formRequestType, array $data = [], array $options = []): FormRequestTester
     {
         $options = array_merge([
             'method' => 'post',

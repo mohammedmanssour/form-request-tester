@@ -6,6 +6,13 @@ A Simple collection of test helpers that help testing form request the easy way.
 
 for full story on why this package was built please refer to [This Blog Post](https://mohammedmanssour.me/blog/testing-laravel-form-requests/)
 
+## Requirements
+
+| Package | Laravel  | PHP    | PHPUnit         |
+| ------- | -------- | ------ | --------------- |
+| 2.x     | 13.x     | 8.5    | 11.5.50 / 12 / 13 |
+| 1.x     | 6.x - 8.x | 7.3 / 8.0 | 8.5 / 9         |
+
 ## Installation
 
 1. Using composer

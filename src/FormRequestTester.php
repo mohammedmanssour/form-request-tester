@@ -2,7 +2,6 @@
 
 namespace MohammedManssour\FormRequestTester;
 
-use \Mockery;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert;
 use Illuminate\Routing\Redirector;
@@ -10,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Mockery;
 
 class FormRequestTester
 {
@@ -33,7 +33,7 @@ class FormRequestTester
      *
      * @var string
      */
-    private $formRequest;
+    private string $formRequest;
 
     /**
      * form request method
@@ -41,7 +41,7 @@ class FormRequestTester
      *
      * @var string
      */
-    private $method;
+    private string $method;
 
     /**
      * form request route
@@ -49,21 +49,21 @@ class FormRequestTester
      *
      * @var string
      */
-    private $route;
+    private ?string $route = null;
 
     /**
      * key/values pair of route paramters to be user with $this->route('parameter') name
      *
      * @var array
      */
-    private $routeParameters = [];
+    private array $routeParameters = [];
 
     /**
      * form request data
      *
      * @var array
      */
-    private $data;
+    private array $data = [];
 
     /**
      * validation errors
@@ -71,21 +71,21 @@ class FormRequestTester
      *
      * @var array
      */
-    private $errors = null;
+    private ?array $errors = null;
 
     /**
      * the form requests authorization status
      *
      * @var boolean
      */
-    private $formRequestAuthorized = true;
+    private bool $formRequestAuthorized = true;
 
     /**
      * validated form request data
      *
      * @var array
      */
-    private $validated;
+    private array $validated = [];
 
     /**
      * Create new FormRequestTester instance
